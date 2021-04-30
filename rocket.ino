@@ -11,49 +11,84 @@ void setup() {
   servo_three.attach(6);
 
   //enable uart communication for debgging servo adjustments
-  Serial.begin(9600);
-  
+  Serial.begin(9600); 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  adjust_servo();
+  //initialize the servo and angle values to be adjusted by user 
+  int srvo = 0;
+  int ang = 0;
+  
+  //constantly gets a srvo value form the user until appropriate value, 1 through 3, is selected  
+  while(srvo == 0){
+      srvo = get_servo();
+  }
+  //waits for user to adjust the servo by an appropiate amount, between 10 and 170 degrees
+  while(ang == 0){
+      ang = get_angle();
+  }
+
+  adjust the user selected servo to the user selected angle
+  adjust_servo(srvo, ang);
 }
 
-//allows the user to choose which servo to adjust
-int get_servo(){
-  Serial.write("Choose a servo to adjust: ");
-  if(Serial.available()){
-      char servo_number = Serial.read();
-      if((servo_number != "1") || (servo_number != "2") || (servo_number != "3")){
-        Serial.write("\r\nYou Chose an invalid servo to adjust\r\n");
-        return -1; 
-       }
-      //returns the servo to adjust from the user
-      return atoi(servo_number);
-   }
-  return 0;
-}
+/* 
+ * Returns: a number typed by the user
+*/
+ int get_integer(){
+  String value = Serial.readString();
+  return value.toInt(); 
+ }
 
-void adjust_servo(){
-      int servo_id = get_servo();
-      if(servo_id == 1){
-          Serial.write("Adjusting Servo 1: choose angle(10 - 170 degrees): ");
-          int angle = atoi(Serial.read());
+
+/*
+ * Returns: desired servo id,  if user doesn't type an integer between 1 and 3 a 0 is returned
+*/
+ int get_servo(){
+  Serial.print("Select your Servo:");
+  int servo_id = get_integer();
+  if((servo_id < 1) || (servo_id > 3)){
+    Serial.println("Incorrect servo option, Try again!");
+    return 0;   
+  }
+  Serial.println(servo_id); 
+  return servo_id;
+ }
+
+/*
+ * Returns: desired angle,  if user doesn't type an integer between 10 and 170, a 0 is returned
+*/
+ int get_angle(){
+  Serial.print("Select your angle:");
+  int angle = get_integer();
+  if((angle < 10) || (angle > 170)){
+    Serial.println("Incorrect angle option, Try again!");
+    return 0;   
+  }
+  Serial.println(angle); 
+  return angle;
+ }
+
+/*
+ * PARAMS: servo - integer id of the servo to be turned
+ *         angle - angle to turn the servo to 
+ * Returns: void
+*/
+void adjust_servo(int servo, int angle){
+      if(servo == 1){
+          Serial.println("Adjusting Servo 1!");
           servo_one.write(angle);
       }
       else if (servo_id == 2){          
-          Serial.write("Adjusting Servo 2: choose angle(10 - 170 degrees): ");
-          int angle = atoi(Serial.read());
+          Serial.println("Adjusting Servo 2!");
           servo_two.write(angle);
       }
       else if (servo_id == 3){
-          Serial.write("Adjusting Servo 3: choose angle(10 - 170 degrees): ");
-          int angle = atoi(Serial.read());
+          Serial.println("Adjusting Servo 3");
           servo_three.write(angle);
       }
       else{
           Serial.write("Improper servo id!\r\n");
-          return;
-      } 
+      }
+      return; 
 }
