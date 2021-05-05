@@ -5,10 +5,12 @@ void setup() {
   Servo servo_one;
   Servo servo_two;
   Servo servo_three;
+  Servo servo_four;
   
   servo_one.attach(3);
   servo_two.attach(5);
   servo_three.attach(6);
+  servo_four.attach(9);
 
   //enable uart communication for debgging servo adjustments
   Serial.begin(9600); 
@@ -85,6 +87,10 @@ void adjust_servo(int servo, int angle){
       }
       else if (servo_id == 3){
           Serial.println("Adjusting Servo 3");
+          servo_three.write(angle);
+      }
+      else if (servo == 4){
+          Serial.println("Adjusting Servo 4");
           servo_three.write(angle);
       }
       else{
